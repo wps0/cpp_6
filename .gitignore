@@ -1,0 +1,52 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# assignment files
+college_example.cc
+college_example.log
+college_kryteria.txt
+college_tresc.txt
+
+# other files
+*~
+cmake-build-debug
+.idea/
+
+#vscode shit
+.vscode/*
+
+#SzymonKozl - local files
+test.cc
+
+#cmake
+build/*
