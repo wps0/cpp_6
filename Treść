@@ -1,0 +1,155 @@
+Zadanie polega na zaprojektowaniu i zaimplementowaniu klas do zarzÄdzania
+uczelniÄ w bardzo uproszczonej formie. Oczekiwane sÄ przynajmniej nastÄpujÄce
+klasy.
+
+== Course ==
+
+Klasa Course reprezentuje przedmiot. Przedmiot ma nazwę i atrybut typu bool
+określający, czy przedmiot jest aktywny.
+
+Klasa Course ma konstruktor przyjmujący dwa parametry: nazwa, aktywność.
+Domyślną wartością aktywności jest true.
+
+Klasa Course nie ma konstruktora bezparametrowego.
+
+Klasa Course ma metody get_name i is_active dające dostęp do jej atrybutółw.
+
+Zakładamy, że kursy są jednoznacznie identyfikowane przez ich nazwy.
+
+== Person ==
+
+Klasa Person reprezentuje osobę. Osoba ma imię i nazwisko.
+
+Klasa Person ma konstruktor przyjmujÄcy dwa parametry: imiÄ, nazwisko.
+
+Klasa Person nie ma konstruktora bezparametrowego.
+
+Klasa Person ma metody get_name i get_surname dajÄce dostÄp do jej atrybutĂłw.
+
+ZakĹadamy, Ĺźe osoby sÄ jednoznacznie identyfikowane imieniem i nazwiskiem.
+
+== Student ==
+
+Klasa Student reprezentuje studenta. Student jest osobÄ. Student ma listÄ
+przedmiotĂłw, na ktĂłre jest zapisany. Student moĹźe byÄ aktywny lub nieaktywny.
+
+Klasa Student ma konstruktor przyjmujÄcy trzy parametry: imiÄ, nazwisko,
+aktywnoĹÄ. DomyĹlnÄ wartoĹciÄ aktywnoĹci jest true.
+
+Klasa Student nie ma konstruktora bezparametrowego.
+
+Klasa Student ma metodÄ is_active dajÄcÄ informacjÄ, czy student jest aktywny.
+
+Klasa Student ma metodÄ get_courses dajÄcÄ niemodyfikowalny dostÄp do jego
+przedmiotĂłw posortowanych wg nazw.
+
+== Teacher ==
+
+Klasa Teacher reprezentuje nauczyciela. Nauczyciel jest osobÄ. Nauczyciel ma
+listÄ przedmiotĂłw, ktĂłre prowadzi.
+
+Klasa Teacher ma konstruktor przyjmujÄcy dwa parametry: imiÄ, nazwisko.
+
+Klasa Teacher nie ma konstruktora bezparametrowego.
+
+Klasa Teacher ma metodÄ get_courses dajÄcÄ niemodyfikowalny dostÄp do jego
+przedmiotĂłw posortowanych wg nazw.
+
+== PhDStudent ==
+
+Klasa PhDStuden reprezentuje doktoranta. Doktorant jest jednoczeĹnie studentem
+i nauczycielem.
+
+== College ==
+
+Klasa College reprezentuje uczelniÄ. Klasa College zawiera kolekcje osĂłb
+i przedmiotĂłw. UdostÄpnia publicznie nastÄpujÄce metody:
+
+bool add_course(name, active = true);
+// Dodaje przedmiot. Zwraca true, jeĹli przedmiot zostaĹ dodany, a false,
+// jeĹli istnieje juĹź przedmiot o tej samej nazwie.
+
+auto find_courses(pattern);
+// Wyszukuje przedmioty o nazwie pasujÄcej do podanego wzorca. Wzorzec moĹźe
+// zawieraÄ wieloznaczniki ? i *.
+
+bool change_course_activeness(course, active);
+// Zmienia status przedmiotu na aktywny lub nieaktywny zgodnie z podanÄ
+// wartoĹciÄ. Zwraca true, jeĹli przedmiot istnieje, a false w przeciwnym
+// przypadku.
+
+bool remove_course(course);
+// Usuwa przedmiot (z kolekcji przedmiotĂłw uczelni) i zmienia jego status
+// na nieaktywny. Zwraca true, jeĹli istnieje przedmiot, lub false w przeciwnym
+// przypadku.
+
+template <typename T>
+bool add_person(name, surname, active = true);
+// Dodaje studenta, doktoranta lub nauczyciela. Typ T moĹźe byÄ tylko Student,
+// PhDStudent lub Teacher. Trzeci parametr jest uwzglÄdniany tylko wtedy, gdy
+// T nie jest Teacher. Zwraca true, jeĹli osoba o podanych imieniu i nazwisku
+// zostaĹa dodana, a false, jeĹli juĹź istnieje taka osoba.
+
+bool change_student_activeness(student, active);
+// Zmienia status studenta na aktywny lub nieaktywny zgodnie z podanÄ
+// wartoĹciÄ. Zwraca true, jeĹli student istnieje, a false w przeciwnym
+// przypadku.
+
+template <typename T>
+auto find(name_pattern, surname_pattern);
+// Wyszukuje osoby o imieniu i nazwisku pasujÄcym do podanych wzorcĂłw.
+// Typ T moĹźe byÄ Person, Student, PhDStudent lub Teacher.
+// Wzorce mogÄ zawieraÄ wieloznaczniki ? i *.
+
+template <typename T>
+auto find(course);
+// Wyszukuje studentĂłw zapisanych na podany przedmiot (jeĹli T = Student)
+// lub nauczycieli prowadzÄcych podany przedmiot (jeĹli T = Teacher).
+
+template <typename T>
+bool assign_course(person, course);
+// Przypisuje przedmiot studentowi lub nauczycielowi zaleĹźnie od tego, czy
+// typ T jest to Student czy Teacher. Podnosi wyjÄtek przy prĂłbie przypisania
+// nieaktywnego przedmiotu lub nieaktywnemu studentowi. Podnosi rĂłwnieĹź
+// wyjÄtek, gdy dana osoba lub dany przedmiot nie istnieje.
+// Funkcja zwraca true, jeĹli przedmiot zostaĹ przypisany studentowi lub
+// nauczycielowi, a false, jeĹli przedmiot byĹ juĹź wczeĹniej przypisany.
+
+== Dodatkowe wymagania
+
+OprĂłcz wyĹźej wymienionych metod, klasy mogÄ mieÄ inne metody niezbÄdne do
+realizacji swoich funkcji.
+
+OprĂłcz wyĹźej wymienionych klas, implementacja moĹźe zawieraÄ inne klasy lub
+struktury niezbÄdne do realizacji przedstawionych wymagaĹ.
+
+W wynikach metod find_courses i find przedmioty majÄ byÄ psortowane wg ich nazw,
+a osoby wg nazwiska i imienia. Wszelkie napisy zawierajÄ tylko znaki ASCII,
+a ich porĂłwnywanie odbywa siÄ wg wartoĹci kodĂłw ASCII.
+
+Tam, gdzie jest to moĹźliwe i uzasadnione, naleĹźy opatrzyÄ metody kwalifikatorami
+const i noexcept.
+
+PrzykĹad uĹźycia znajduje siÄ w pliku college_example.cc. Wynik jego dziaĹania
+jest w pliku college_example.log.
+
+RozwiÄzanie musi zawieraÄ plik nagĹĂłwkowy college.h. OprĂłcz tego rozwiÄzanie
+moĹźe zawieraÄ dodatkowe pliki nagĹĂłwkowe *.h oraz opcjonalnie pliki
+ĹşrĂłdĹowe *.cc.
+
+RozwiÄzanie bÄdzie kompilowane poleceniem
+
+g++ -Wall -Wextra -O2 -std=c++20 *.cc
+
+Pliki rozwiÄzania naleĹźy umieĹciÄ w repozytorium w katalogu
+
+grupaN/zadanie6/ab123456+cd123456
+
+lub
+
+grupaN/zadanie6/ab123456+cd123456+ef123456
+
+gdzie N jest numerem grupy, a ab123456, cd123456, ef123456 sÄ identyfikatorami
+czĹonkĂłw zespoĹu umieszczajÄcego to rozwiÄzanie. Katalog z rozwiÄzaniem nie
+powinien zawieraÄ innych plikĂłw. Nie wolno umieszczaÄ w repozytorium plikĂłw
+duĹźych, wykonywalnych, binarnych, tymczasowych (np. *.o) ani innych zbÄdnych.
