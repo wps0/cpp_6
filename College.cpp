@@ -117,10 +117,14 @@ bool College::assign_course<Student>(
         const std::shared_ptr<Course> &course
 ) {
     //TODO: proper exceptions
-    if (!students_.contains(student) or !student->is_active())
-        throw std::runtime_error("Student is inactive or does not exist.");
-    if (!courses_.contains(course) or !course->is_active())
-        throw std::runtime_error("Course is inactive or does not exist.");
+    if (!course->is_active())
+        throw std::runtime_error("Incorrect operation on an inactive course.");
+    if (!courses_.contains(course))
+        throw std::runtime_error("Non-existing course.");
+    if (!students_.contains(student))
+        throw std::runtime_error("Non-existing person.");
+    if (!student->is_active())
+        throw std::runtime_error("Incorrect operation for an inactive student.");
 
     student->add_course(course);
     return course_students_[course].add(student);
@@ -132,10 +136,12 @@ bool College::assign_course<Teacher>(
         const std::shared_ptr<Course> &course
 ) {
     //TODO: proper exceptions
+    if (!courses_.contains(course))
+        throw std::runtime_error("Non-existing course.");
+    if (!course->is_active())
+        throw std::runtime_error("Incorrect operation on an inactive course.");
     if (!teachers_.contains(teacher))
-        throw std::runtime_error("Teacher does not exist.");
-    if (!courses_.contains(course) or !course->is_active())
-        throw std::runtime_error("Course is inactive or does not exist.");
+        throw std::runtime_error("Non-existing person.");
 
     teacher->add_course(course);
     return course_teachers_[course].add(teacher);
