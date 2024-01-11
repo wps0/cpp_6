@@ -38,18 +38,15 @@ namespace Tests {
         }
     };
 
+    constexpr TestCourse EMPTY_COURSE = {"", false};
     constexpr int MAX_LEN = 10;
-    constexpr int COURSES_TESTS = 3;
+    constexpr int COURSES_TESTS = 199;
     set<TestCourse> courses;
     College instance;
 
-    static mt19937& rng() {
-        static mt19937 rng_mt(66643);
-        return rng_mt;
-    }
-
     int gi(int lb, int ub) {
-        return uniform_int_distribution(lb, ub)(rng());
+        static mt19937 rng(66643);
+        return uniform_int_distribution<int>(lb, ub)(rng);
     }
 
     string gen_string(int len) {
@@ -80,9 +77,12 @@ namespace Tests {
     }
 
     TestCourse random_course() {
-        auto it = courses.begin();
-        advance(it, gi(0, courses.size()-1));
-        return *it;
+        if (!courses.empty()) {
+            auto it = courses.begin();
+            advance(it, gi(0, courses.size()-1));
+            return *it;
+        }
+        return EMPTY_COURSE;
     }
 
     string random_course_name() {
@@ -100,15 +100,16 @@ namespace Tests {
     bool perform_courses_op() {
         int op = gi(0, 99);
         bool expected = true, actual;
-        cerr << "OP: " << op << endl;
-        if (op < 40) {
+        if (courses.empty() || op < 40) {
             TestCourse tc = {random_course_name(), static_cast<bool>(gi(0, 1))};
             expected = !contains_course(tc);
+            courses.insert(tc);
             actual = instance.add_course(tc.name, tc.active);
         } else if (op < 70) {
             TestCourse const& tc = random_course();
             courses.erase(tc);
-            actual = instance.remove_course(*instance.find_courses(tc.name).begin());
+            auto course_col = instance.find_courses(tc.name);
+            actual = instance.remove_course(*course_col.begin());
         } else {
             TestCourse tc = random_course();
             courses.erase(tc);
@@ -138,4 +139,6 @@ int main() {
         Tests::assert_msg(Tests::perform_courses_op(), "Test " + to_string(i) + " failed");
     }
     Tests::validate_courses();
+
+    cout << "OK" << endl;
 }
