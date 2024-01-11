@@ -38,10 +38,56 @@ namespace Tests {
         }
     };
 
+    class GigaChadPhDStudent : public PhDStudent {
+    public:
+        GigaChadPhDStudent(const string &name, const string &surname,
+                           bool active) : Person(name, surname), PhDStudent(name, surname, active) {}
+    };
+
+    struct TestPerson {
+        string name, surname;
+        int type;
+
+        bool operator==(const TestPerson &rhs) const {
+            return name == rhs.name &&
+                   surname == rhs.surname;
+        }
+
+        bool operator!=(const TestPerson &rhs) const {
+            return !(rhs == *this);
+        }
+
+        bool operator<(const TestPerson &rhs) const {
+            if (name < rhs.name)
+                return true;
+            if (rhs.name < name)
+                return false;
+            if (surname < rhs.surname)
+                return true;
+            if (rhs.surname < surname)
+                return false;
+            return type < rhs.type;
+        }
+
+        bool operator>(const TestPerson &rhs) const {
+            return rhs < *this;
+        }
+
+        bool operator<=(const TestPerson &rhs) const {
+            return !(rhs < *this);
+        }
+
+        bool operator>=(const TestPerson &rhs) const {
+            return !(*this < rhs);
+        }
+    };
+
     constexpr TestCourse EMPTY_COURSE = {"", false};
+    constexpr TestPerson EMPTY_PERSON = {"", "", -1};
     constexpr int MAX_LEN = 10;
     constexpr int COURSES_TESTS = 199;
     set<TestCourse> courses;
+    set<TestPerson> people;
     College instance;
 
     int gi(int lb, int ub) {
@@ -85,6 +131,15 @@ namespace Tests {
         return EMPTY_COURSE;
     }
 
+    TestPerson random_person() {
+        if (!courses.empty()) {
+            auto it = people.begin();
+            advance(it, gi(0, people.size()-1));
+            return *it;
+        }
+        return EMPTY_PERSON;
+    }
+
     string random_course_name() {
         if (gi(0, 2) == 0) {
             return random_course().name;
@@ -121,6 +176,44 @@ namespace Tests {
         return expected == actual;
     }
 
+    bool perform_people_op() {
+        int op = gi(0, 99);
+        bool expected = true, actual;
+        if (courses.empty() || people.empty() || op < 20) {
+            string name = gen_string(MAX_LEN), surname = gen_string(MAX_LEN);
+            int type = 0;
+
+            if (op < 20) {
+                actual = instance.add_person<Student>(name, surname);
+            } else if (op < 30) {
+                type = 1;
+                actual = instance.add_person<PhDStudent>(name, surname);
+            } else {
+                type = 2;
+                actual = instance.add_person<Teacher>(name, surname);
+            }
+
+            if (people.contains({name, surname, type}))
+                expected = false;
+
+        } else {
+            TestPerson tp = random_person();
+            TestCourse c = random_course();
+            auto stud = instance.find<Student>(tp.name, tp.surname);
+            auto ts = instance.find<Teacher>(tp.name, tp.surname);
+            auto pds = instance.find<PhDStudent>(tp.name, tp.surname);
+            auto course = instance.find_courses(c.name);
+
+            if (stud.empty() && ts.empty() && pds.empty()) {
+                actual = false;
+            } else if (!stud.empty()){
+//                actual = instance.assign_course(*stud.begin(), course.begin());
+            }
+        }
+
+        return expected == actual;
+    }
+
     void init(int seed) {
         instance = College();
     }
@@ -131,14 +224,24 @@ namespace Tests {
             exit(1);
         }
     }
+
+    void test_courses() {
+        cout << "Courses test: ";
+        for (int i = 0; i < Tests::COURSES_TESTS; i++) {
+            Tests::assert_msg(Tests::perform_courses_op(), "Test " + to_string(i) + " failed");
+        }
+        Tests::validate_courses();
+        cout << "OK" << endl;
+    }
 }
 
 int main() {
     Tests::init(321312);
-    for (int i = 0; i < Tests::COURSES_TESTS; i++) {
-        Tests::assert_msg(Tests::perform_courses_op(), "Test " + to_string(i) + " failed");
-    }
-    Tests::validate_courses();
+    auto tests = {
+            &Tests::test_courses
+    };
 
+    for (auto f : tests)
+        f();
     cout << "OK" << endl;
 }
