@@ -4,10 +4,6 @@
 #include <string>
 
 namespace regex_helper {
-    static bool is_letter(char c) {
-        return ('a' <= c and c <= 'z') or
-               ('A' <= c and c <= 'Z');
-    }
 
     static std::string convert_regex(const std::string &pattern) {
         std::string ret;
@@ -16,8 +12,7 @@ namespace regex_helper {
                 ret += '.';
             } else if (c == '?') { // match exactly one character
                 c = '.';
-            } else if (!is_letter(c))
-                ret += '\\'; // add escape character
+            }
 
             ret += c;
         }

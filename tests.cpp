@@ -103,11 +103,13 @@ namespace Tests {
         string name;
 
         for (int i = 0; i < len; ++i) {
-            int type = gi(0, 10);
+            int type = gi(0, 14);
             if (type <= 5)
                 name += (char) gi('a', 'z');
             else if (type <= 9)
                 name += (char) gi('A', 'Z');
+            else if (type <= 13)
+                name += (char) gi('0', '9');
             else
                 name += ' ';
         }
@@ -306,6 +308,13 @@ namespace Tests {
             assert(!college2.assign_course<Teacher>(jakis_teacher, algo_c));
             assert(false);
         } catch (exception e) {}
+
+        assert(college2.add_course("AISD"));
+
+        assert(college2.find_courses("A???").size() == 2);
+        assert(college2.find_courses("A*").size() == 2);
+        assert(college2.find_courses("AISD*").size() == 1);
+        assert(college2.find_courses("AI*SD").size() == 1);
 
         cout << "OK" << endl;
     }
