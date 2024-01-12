@@ -4,6 +4,12 @@
 #include <string>
 #include <utility>
 
+namespace details {
+    inline static auto cmp_pnt = [](const auto &a, const auto &b) {
+        return *a < *b;
+    };
+}
+
 class Person {
 protected:
     std::string name_;

@@ -5,9 +5,14 @@ bool College::add_course(const std::string &name, bool active) {
     return courses_.add(new_course);
 }
 
-std::vector<std::shared_ptr<Course>>College::find_courses(const std::string &pattern) {
-    return courses_.find_courses(pattern);
-}
+// TODO: nie działa
+/*std::set<std::shared_ptr<Course>, decltype(details::cmp_pnt)> College::find_courses(const std::string &pattern) {
+    auto tmp = courses_.find_courses(pattern);
+    std::set<std::shared_ptr<Course>, decltype(details::cmp_pnt)> result(details::cmp_pnt);
+    for (const auto &ptr : tmp)
+        result.emplace(ptr);
+    return result;
+}*/
 
 bool College::change_course_activeness(const std::shared_ptr<Course> &course, bool active) {
     if (!courses_.contains(course))
@@ -39,9 +44,6 @@ bool College::add_person<PhDStudent>(const std::string &name, const std::string 
     if (person_exists(name, surname)) return false;
     auto phd_student = std::make_shared<PhDStudent>(name, surname, active);
 
-    bool ret = phd_students_.add(phd_student);
-    if (!ret) return false;
-
     students_.add(phd_student);
     teachers_.add(phd_student);
     return true;
@@ -55,59 +57,41 @@ bool College::change_student_activeness(const std::shared_ptr<Student> &student,
     return true;
 }
 
+// TODO: nie działa
+/*template <typename T>
+    requires (std::is_same_v<T, Person>
+              || std::is_same_v<T, Teacher>
+              || std::is_same_v<T, Student>
+              || std::is_same_v<T, PhDStudent>)
+    std::set<std::shared_ptr<T>, decltype(details::cmp_pnt)> College::find(const std::string &name_pattern, const std::string &surname_pattern) {
+    std::set<std::shared_ptr<T>, decltype(details::cmp_pnt)> result(details::cmp_pnt);
+    if constexpr (std::is_base_of_v<Student, T> || std::is_base_of_v<T, Student>) {
+        auto students = students_.find_people(name_pattern, surname_pattern);
+        for (const auto &val : students) {
+            auto tmp = std::dynamic_pointer_cast<T>(val);
+            if (tmp != nullptr)
+                result.insert(tmp);
+        }
+    }
 
-template<> std::vector<std::shared_ptr<Person>> College::find<Person>(
-        const std::string &name_pattern,
-        const std::string &surname_pattern
-) {
-    auto students = students_.find_people(name_pattern, surname_pattern);
-    auto teachers = teachers_.find_people(name_pattern, surname_pattern);
-
-    std::vector<std::shared_ptr<Person>> result;
-    for (const auto &val : students)
-        result.emplace_back(val);
-    for (const auto &val : teachers)
-        result.emplace_back(val);
-
-    std::sort(result.begin(), result.end(), [](const auto &a, const auto &b) {
-        return *a < *b;
-    });
-    auto equal = [](const auto &a, const auto &b) {
-        return a->get_name() == b->get_name() and
-               a->get_surname() == b->get_surname();
-    };
-    result.erase(std::unique(result.begin(), result.end(), equal), result.end());
+    if constexpr (std::is_base_of_v<T, Teacher>) {//(std::is_base_of_v<Teacher, T> || std::is_base_of_v<T, Teacher>) {
+        auto teachers = teachers_.find_people(name_pattern, surname_pattern);
+        for (const auto &val : teachers) {
+            auto tmp = std::dynamic_pointer_cast<T>(val);
+            if (tmp != nullptr)
+                result.insert(tmp);
+        }
+    }
     return result;
-}
-
-template<> std::vector<std::shared_ptr<Student>> College::find<Student>(
-        const std::string &name_pattern,
-        const std::string &surname_pattern
-) {
-    return students_.find_people(name_pattern, surname_pattern);
-}
-
-template<> std::vector<std::shared_ptr<Teacher>> College::find<Teacher>(
-        const std::string &name_pattern,
-        const std::string &surname_pattern
-) {
-    return teachers_.find_people(name_pattern, surname_pattern);
-}
-
-template<> std::vector<std::shared_ptr<PhDStudent>> College::find<PhDStudent>(
-        const std::string &name_pattern,
-        const std::string &surname_pattern
-) {
-    return phd_students_.find_people(name_pattern, surname_pattern);
-}
+}*/
 
 template<>
-std::vector<std::shared_ptr<Teacher>> College::find<Teacher>(const std::shared_ptr<Course> &course) {
+std::set<std::shared_ptr<Teacher>> College::find<Teacher>(const std::shared_ptr<Course> &course) {
     return course_teachers_[course].get_values();
 }
 
 template<>
-std::vector<std::shared_ptr<Student>> College::find<Student>(const std::shared_ptr<Course> &course) {
+std::set<std::shared_ptr<Student>> College::find<Student>(const std::shared_ptr<Course> &course) {
     return course_students_[course].get_values();
 }
 
@@ -116,11 +100,14 @@ bool College::assign_course<Student>(
         const std::shared_ptr<Student> &student,
         const std::shared_ptr<Course> &course
 ) {
-    //TODO: proper exceptions
-    if (!students_.contains(student) or !student->is_active())
-        throw std::runtime_error("Student is inactive or does not exist.");
-    if (!courses_.contains(course) or !course->is_active())
-        throw std::runtime_error("Course is inactive or does not exist.");
+    if (!course->is_active())
+        throw std::runtime_error("Incorrect operation on an inactive course.");
+    if (!courses_.contains(course))
+        throw std::runtime_error("Non-existing course.");
+    if (!students_.contains(student))
+        throw std::runtime_error("Non-existing person.");
+    if (!student->is_active())
+        throw std::runtime_error("Incorrect operation for an inactive student.");
 
     student->add_course(course);
     return course_students_[course].add(student);
@@ -131,11 +118,12 @@ bool College::assign_course<Teacher>(
         const std::shared_ptr<Teacher> &teacher,
         const std::shared_ptr<Course> &course
 ) {
-    //TODO: proper exceptions
+    if (!courses_.contains(course))
+        throw std::runtime_error("Non-existing course.");
+    if (!course->is_active())
+        throw std::runtime_error("Incorrect operation on an inactive course.");
     if (!teachers_.contains(teacher))
-        throw std::runtime_error("Teacher does not exist.");
-    if (!courses_.contains(course) or !course->is_active())
-        throw std::runtime_error("Course is inactive or does not exist.");
+        throw std::runtime_error("Non-existing person.");
 
     teacher->add_course(course);
     return course_teachers_[course].add(teacher);

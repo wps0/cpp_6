@@ -5,7 +5,6 @@
 
 #include <memory>
 #include <set>
-#include <vector>
 
 template<typename T>
 class MyList {
@@ -21,7 +20,7 @@ public:
     bool add(const std::shared_ptr<T> &val);
     bool remove(const std::shared_ptr<T> &val);
     bool contains(const std::shared_ptr<T> &val) const;
-    std::vector<std::shared_ptr<T>> get_values() const;
+    std::set<std::shared_ptr<T>> get_values() const;
 };
 
 template<class T>
@@ -47,11 +46,10 @@ bool MyList<T>::contains(const std::shared_ptr<T> &value) const {
 }
 
 template<class T>
-std::vector<std::shared_ptr<T>> MyList<T>::get_values() const {
-    std::vector<std::shared_ptr<T>> result;
-    result.reserve(values_.size());
+std::set<std::shared_ptr<T>> MyList<T>::get_values() const {
+    std::set<std::shared_ptr<T>> result;
     for (auto &value : values_)
-        result.emplace_back(value);
+        result.emplace(value);
     return result;
 }
 
