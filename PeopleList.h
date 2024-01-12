@@ -1,14 +1,14 @@
 #ifndef COLLEGE_PEOPLELIST_H
 #define COLLEGE_PEOPLELIST_H
 
-#include "MyList.h"
+#include "SharedPtrSet.h"
 #include "Person.h"
 #include "regex_helper.h"
 
 #include <regex>
 
 template<typename T> requires (std::is_convertible_v<T, Person>)
-class PeopleList : public MyList<T> {
+class PeopleList : public SharedPtrSet<T> {
 public:
     std::set<std::shared_ptr<T>> find_people(
         std::string name_pattern = "*",

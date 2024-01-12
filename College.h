@@ -9,7 +9,7 @@
 #include "Teacher.h"
 #include "PhDStudent.h"
 
-#include "MyList.h"
+#include "SharedPtrSet.h"
 #include "CoursesList.h"
 #include "PeopleList.h"
 
@@ -99,7 +99,7 @@ public:
     template <typename T>
     requires (std::is_convertible_v<T, Student>
               || std::is_convertible_v<T, Teacher>)
-    bool assign_course(const std::shared_ptr<T> &, const std::shared_ptr<Course> &course);
+    bool assign_course(const std::shared_ptr<T> &person, const std::shared_ptr<Course> &course);
 
 };
 

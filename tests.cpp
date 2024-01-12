@@ -85,9 +85,13 @@ namespace Tests {
     constexpr TestCourse EMPTY_COURSE = {"", false};
     constexpr TestPerson EMPTY_PERSON = {"", "", -1};
     constexpr int MAX_LEN = 10;
-    constexpr int COURSES_TESTS = 199;
+    constexpr int COURSES_TESTS = 20000;
+    constexpr int PEOPLE_TESTS = 20000;
+    constexpr int FIND_TESTS = 20000;
     set<TestCourse> courses;
     set<TestPerson> people;
+    // person, course
+    set<pair<string, string>> assignments;
     College instance;
 
     int gi(int lb, int ub) {
@@ -116,7 +120,7 @@ namespace Tests {
         if (courses.size() != all_courses.size())
             return false;
 
-        for (shared_ptr<Course> &c : all_courses)
+        for (shared_ptr<Course> const& c : all_courses)
             if (!courses.contains({c->get_name(), c->is_active()}))
                 return false;
         return true;
@@ -128,6 +132,7 @@ namespace Tests {
             advance(it, gi(0, courses.size()-1));
             return *it;
         }
+
         return EMPTY_COURSE;
     }
 
@@ -143,8 +148,8 @@ namespace Tests {
     string random_course_name() {
         if (gi(0, 2) == 0) {
             return random_course().name;
-
         }
+
         return gen_string(gi(1, MAX_LEN));
     }
 
@@ -161,8 +166,11 @@ namespace Tests {
             courses.insert(tc);
             actual = instance.add_course(tc.name, tc.active);
         } else if (op < 70) {
-            TestCourse const& tc = random_course();
-            courses.erase(tc);
+            TestCourse tc = random_course();
+            assert(courses.erase(tc) == 1);
+            courses.erase({tc.name, !tc.active});
+//            cout << tc.name << endl;
+
             auto course_col = instance.find_courses(tc.name);
             actual = instance.remove_course(*course_col.begin());
         } else {
@@ -179,7 +187,7 @@ namespace Tests {
     bool perform_people_op() {
         int op = gi(0, 99);
         bool expected = true, actual;
-        if (courses.empty() || people.empty() || op < 20) {
+        if (courses.empty() || people.empty() || op < 35) {
             string name = gen_string(MAX_LEN), surname = gen_string(MAX_LEN);
             int type = 0;
 
@@ -195,20 +203,35 @@ namespace Tests {
 
             if (people.contains({name, surname, type}))
                 expected = false;
-
         } else {
             TestPerson tp = random_person();
             TestCourse c = random_course();
             auto stud = instance.find<Student>(tp.name, tp.surname);
             auto ts = instance.find<Teacher>(tp.name, tp.surname);
-            auto pds = instance.find<PhDStudent>(tp.name, tp.surname);
-            auto course = instance.find_courses(c.name);
+            auto phds = instance.find<PhDStudent>(tp.name, tp.surname);
+            auto found_courses = instance.find_courses(c.name);
 
-            if (stud.empty() && ts.empty() && pds.empty()) {
+            if (stud.empty() && ts.empty() && phds.empty()) {
                 actual = false;
-            } else if (!stud.empty()){
-//                actual = instance.assign_course(*stud.begin(), course.begin());
+            } else if (!stud.empty()) {
+                actual = instance.assign_course(*stud.begin(), *found_courses.begin());
+            } else if (!phds.empty()) {
+                if (gi(0, 2))
+                    actual = instance.assign_course<Student>(*phds.begin(), *found_courses.begin());
+                else
+                    actual = instance.assign_course<Teacher>(*phds.begin(), *found_courses.begin());
+            } else {
+                actual = instance.assign_course(*ts.begin(), *found_courses.begin());
             }
+
+            if (gi(0, 20) < 5) {
+                if (!stud.empty())
+                    instance.change_student_activeness(*stud.begin(), !stud.begin()->get()->is_active());
+                else
+                    instance.change_student_activeness(*stud.begin(), !phds.begin()->get()->is_active());
+            }
+
+            expected = !assignments.contains({tp.name + tp.surname, c.name});
         }
 
         return expected == actual;
@@ -227,10 +250,63 @@ namespace Tests {
 
     void test_courses() {
         cout << "Courses test: ";
-        for (int i = 0; i < Tests::COURSES_TESTS; i++) {
-            Tests::assert_msg(Tests::perform_courses_op(), "Test " + to_string(i) + " failed");
+        for (int i = 0; i < COURSES_TESTS; i++) {
+            assert_msg(perform_courses_op(), "Test " + to_string(i) + " failed");
         }
-        Tests::validate_courses();
+        validate_courses();
+        cout << "OK" << endl;
+    }
+
+    void test_people() {
+        cout << "People test: ";
+        for (int i = 0; i < PEOPLE_TESTS; i++) {
+            assert_msg(perform_courses_op(), "Test " + to_string(i) + " failed");
+        }
+        validate_courses();
+        cout << "OK" << endl;
+    }
+
+    void test_find() {
+        cout << "Find tests: ";
+    }
+
+    void test_corner_cases() {
+        cout << "Corner cases: ";
+
+        College college{};
+
+        // https://moodle.mimuw.edu.pl/mod/forum/discuss.php?d=9377#p20098 2)
+        assert(college.add_person<PhDStudent>("Krzysztof", "Dix"));
+        assert(college.add_person<Teacher>("Krzysztof", "Jakis"));
+        assert(college.add_course("AIDS"));
+        auto dix_phd = *college.find<PhDStudent>("K*", "?i?").begin();
+        auto jakis_teacher = *college.find<Teacher>("*", "*").begin();
+        shared_ptr<Course> algo_c = *college.find_courses("*").begin();
+
+        assert_msg(college.find<PhDStudent>("*", "*").size() == 1,
+                   "Actual size: " + to_string(college.find<Teacher>("*", "*").size()));
+
+        assert(college.assign_course<Student>(dix_phd, algo_c));
+        assert(college.assign_course<Teacher>(dix_phd, algo_c));
+        assert(college.find<Teacher>(algo_c).size() == 1);
+        assert(college.find<Student>(algo_c).size() == 1);
+
+        // https://moodle.mimuw.edu.pl/mod/forum/discuss.php?d=9377#p20098 3)
+        College college2{};
+        assert(college2.add_course("AIDS"));
+        assert(!college2.change_course_activeness(algo_c, false));
+        assert(!college2.remove_course(algo_c));
+
+        try {
+            assert(!college2.assign_course<Teacher>(jakis_teacher, algo_c));
+            assert(false);
+        } catch (exception e) {}
+        algo_c = *college2.find_courses("AIDS").begin();
+        try {
+            assert(!college2.assign_course<Teacher>(jakis_teacher, algo_c));
+            assert(false);
+        } catch (exception e) {}
+
         cout << "OK" << endl;
     }
 }
@@ -238,10 +314,12 @@ namespace Tests {
 int main() {
     Tests::init(321312);
     auto tests = {
-            &Tests::test_courses
+            &Tests::test_corner_cases,
+            &Tests::test_courses,
+            &Tests::test_people
     };
 
     for (auto f : tests)
         f();
-    cout << "OK" << endl;
+    cout << "All tests have passed!" << endl;
 }

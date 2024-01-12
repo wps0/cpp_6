@@ -13,7 +13,7 @@ public:
     explicit Course(std::string name, bool active = true)
         : name_(std::move(name)), active_(active) {}
 
-    [[nodiscard]] std::string get_name() const {
+    [[nodiscard]] std::string const& get_name() const {
         return name_;
     }
 

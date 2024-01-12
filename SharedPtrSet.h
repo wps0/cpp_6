@@ -7,7 +7,7 @@
 #include <set>
 
 template<typename T>
-class MyList {
+class SharedPtrSet {
 protected:
     static bool compare(
             const std::shared_ptr<T> &lhs, const std::shared_ptr<T> &rhs) {
@@ -16,7 +16,7 @@ protected:
     std::set<std::shared_ptr<T>, decltype(&compare)> values_;
 
 public:
-    MyList() : values_(&compare) {}
+    SharedPtrSet() : values_(&compare) {}
     bool add(const std::shared_ptr<T> &val);
     bool remove(const std::shared_ptr<T> &val);
     bool contains(const std::shared_ptr<T> &val) const;
@@ -24,7 +24,7 @@ public:
 };
 
 template<class T>
-bool MyList<T>::add(const std::shared_ptr<T> &value) {
+bool SharedPtrSet<T>::add(const std::shared_ptr<T> &value) {
     if (values_.contains(value))
         return false;
     values_.insert(value);
@@ -32,7 +32,7 @@ bool MyList<T>::add(const std::shared_ptr<T> &value) {
 }
 
 template<class T>
-bool MyList<T>::remove(const std::shared_ptr<T> &value) {
+bool SharedPtrSet<T>::remove(const std::shared_ptr<T> &value) {
     if (!values_.contains(value))
         return false;
     values_.erase(value);
@@ -40,13 +40,13 @@ bool MyList<T>::remove(const std::shared_ptr<T> &value) {
 }
 
 template<class T>
-bool MyList<T>::contains(const std::shared_ptr<T> &value) const {
+bool SharedPtrSet<T>::contains(const std::shared_ptr<T> &value) const {
     auto it = values_.find(value);
     return (it != values_.end() and *it == value);
 }
 
 template<class T>
-std::set<std::shared_ptr<T>> MyList<T>::get_values() const {
+std::set<std::shared_ptr<T>> SharedPtrSet<T>::get_values() const {
     std::set<std::shared_ptr<T>> result;
     for (auto &value : values_)
         result.emplace(value);
