@@ -80,7 +80,7 @@ public:
         }
 
         if constexpr (std::is_base_of_v<T, Teacher>) { // T = Person or Teacher
-            // unnecessary for PhDs, since they'll get catched by student search
+            // unnecessary for PhDs, since they'll get caught by student search
             auto teachers = teachers_.find_people(name_pattern, surname_pattern);
             for (const auto &val : teachers) {
                 auto tmp = std::dynamic_pointer_cast<T>(val);

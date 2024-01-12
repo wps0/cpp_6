@@ -316,6 +316,22 @@ namespace Tests {
         assert(college2.find_courses("AISD*").size() == 1);
         assert(college2.find_courses("AI*SD").size() == 1);
 
+        assert(college2.add_course("AnnD"));
+        assert(college2.add_course("Annd"));
+        assert(college2.find_courses("A???").size() == 4);
+        assert(college2.find_courses("A*D").size() == 2);
+        assert(college2.find_courses("A*???").size() == 4);
+        assert(college2.find_courses("?*?*").size() == 4);
+        assert(college2.find_courses("******?*?*").size() == 4);
+        assert(college2.find_courses("******?*?*?????").empty());
+
+        assert(college.find<PhDStudent>("*", "*").size() == 1);
+        assert(college.find<PhDStudent>("Krzy*of", "D*").size() == 1);
+        assert_msg(college.find<Teacher>("*", "*").size() == 2,
+                   "Actual size: " + to_string(college.find<Teacher>("*", "*").size()));
+        assert(college.find<Student>("*", "*").size() == 1);
+        assert(college.find<Person>("*", "*").size() == 2);
+
         cout << "OK" << endl;
     }
 }
