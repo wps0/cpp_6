@@ -22,14 +22,14 @@ int main() {
   assert(college.add_course("Analysis"));
   assert(college.add_course("Algebra"));
   assert(college.add_course("Geometry"));
-  assert(college.add_course("C++"));
+  assert(college.add_course("CPP"));
   assert(college.add_course("Python"));
   assert(college.add_course("History", false));
   assert(college.add_course("Biology"));
 
-  auto courses = college.find_courses("C++");
+  auto courses = college.find_courses("CPP");
   assert(courses.size() == 1);
-  assert((*courses.begin())->get_name() == "C++");
+  assert((*courses.begin())->get_name() == "CPP");
 
   courses = college.find_courses("A*");
   assert(courses.size() == 2);
@@ -82,7 +82,7 @@ int main() {
   auto alicja_fiszer = *college.find<PhDStudent>("Alicja", "Fiszer").begin();
   auto jakub_kubanski = *college.find<PhDStudent>("Jakub", "Kubanski").begin();
   auto jacek_chlebus = *college.find<Teacher>("Jacek", "Chlebus").begin();
-  auto cxx = *college.find_courses("C++").begin();
+  auto cxx = *college.find_courses("CPP").begin();
   auto algebra = *college.find_courses("Algebra").begin();
   auto analysis = *college.find_courses("Analysis").begin();
   auto geometry = *college.find_courses("Geometry").begin();
@@ -157,19 +157,19 @@ int main() {
   }
 
   try {
-    auto cxx2 = std::make_shared<Course>("C++");
+    auto cxx2 = std::make_shared<Course>("CPP");
     college.assign_course(jan_kowalski, cxx2);
     assert(false);
   } catch (std::exception const & e) {
     std::clog << e.what() << std::endl;
   }
 
-  assert((*alicja_fiszer->Student::get_courses().begin())->get_name() == "C++");
+  assert((*alicja_fiszer->Student::get_courses().begin())->get_name() == "CPP");
   assert(cxx->is_active() == true);
   assert(college.remove_course(cxx));
   assert(!college.change_course_activeness(cxx, true));
   assert(cxx->is_active() == false);
-  assert(college.find_courses("C++").empty());
-  assert((*alicja_fiszer->Student::get_courses().begin())->get_name() == "C++");
+  assert(college.find_courses("CPP").empty());
+  assert((*alicja_fiszer->Student::get_courses().begin())->get_name() == "CPP");
   //assert(jacek_chlebus->get_courses().count(cxx) == 1);
 }
