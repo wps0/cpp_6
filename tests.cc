@@ -332,6 +332,9 @@ namespace Tests {
         assert(college.find<Student>("*", "*").size() == 1);
         assert(college.find<Person>("*", "*").size() == 2);
 
+        assert(college.find<Teacher>(make_shared<Course>("Abba")).size() == 0);
+        assert(college.add_course("Abba"));
+
         cout << "OK" << endl;
     }
 }

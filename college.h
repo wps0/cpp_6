@@ -37,7 +37,7 @@ public:
     bool add_course(const std::string &name, bool active = true);
 
     // TODO: jak umiecie wywalić do .cpp żeby to łapało to to zróbcie XD
-    std::set<std::shared_ptr<Course>, decltype(details::cmp_pnt)> find_courses(const std::string &pattern) {
+    std::set<std::shared_ptr<Course>, decltype(details::cmp_pnt)> find_courses(const std::string &pattern) const {
         auto tmp = courses_.find_courses(pattern);
         std::set<std::shared_ptr<Course>, decltype(details::cmp_pnt)> result(details::cmp_pnt);
         for (const auto &ptr : tmp)
@@ -68,7 +68,7 @@ public:
               || std::is_same_v<T, Teacher>
               || std::is_same_v<T, Student>
               || std::is_same_v<T, PhDStudent>)
-    std::set<std::shared_ptr<T>, decltype(details::cmp_pnt)> find(const std::string &name_pattern, const std::string &surname_pattern) {
+    std::set<std::shared_ptr<T>, decltype(details::cmp_pnt)> find(const std::string &name_pattern, const std::string &surname_pattern) const {
         std::set<std::shared_ptr<T>, decltype(details::cmp_pnt)> result(details::cmp_pnt);
         if constexpr (std::is_base_of_v<Student, T> || std::is_base_of_v<T, Student>) {
             auto students = students_.find_people(name_pattern, surname_pattern);

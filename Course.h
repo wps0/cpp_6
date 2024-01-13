@@ -17,11 +17,11 @@ public:
         return name_;
     }
 
-    [[nodiscard]] bool is_active() const {
+    [[nodiscard]] bool is_active() const noexcept {
         return active_;
     }
 
-    void set_active(bool active) {
+    void set_active(bool active) noexcept {
         active_ = active;
     }
 

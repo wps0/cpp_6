@@ -16,7 +16,7 @@ protected:
     std::string surname_;
 
 public:
-    Person(std::string name, std::string surname)
+    Person(std::string name, std::string surname) noexcept
         : name_(std::move(name)), surname_(std::move(surname)) {}
 
     virtual ~Person() = default;

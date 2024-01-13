@@ -3,7 +3,7 @@ project(College)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(College main.cpp
+add_executable(College main.cc
         CoursesList.h
         Person.h
         PhDStudent.h
