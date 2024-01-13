@@ -1,5 +1,5 @@
 #include <bits/stdc++.h>
-#include "College.h"
+#include "college.h"
 
 using namespace std;
 

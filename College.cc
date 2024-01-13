@@ -1,4 +1,4 @@
-#include "College.h"
+#include "college.h"
 
 bool College::add_course(const std::string &name, bool active) {
     std::shared_ptr<Course> new_course = std::make_shared<Course>(name, active);

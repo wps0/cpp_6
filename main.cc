@@ -1,4 +1,4 @@
-#include "College.h"
+#include "college.h"
 
 #include <iostream>
 #include <memory>

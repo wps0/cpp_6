@@ -9,23 +9,23 @@ add_executable(College main.cpp
         PhDStudent.h
         Student.h
         Teacher.h
-        CoursesList.cpp
-        College.h
-        College.cpp
+        CoursesList.cc
+        college.h
+        College.cc
         PeopleList.h
         regex_helper.h
 )
 
 
-add_executable(CollegeTests tests.cpp
+add_executable(CollegeTests tests.cc
         CoursesList.h
         Person.h
         PhDStudent.h
         Student.h
         Teacher.h
-        CoursesList.cpp
-        College.h
-        College.cpp
+        CoursesList.cc
+        college.h
+        College.cc
         PeopleList.h
         regex_helper.h
 )
