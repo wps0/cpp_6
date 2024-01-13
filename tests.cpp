@@ -335,7 +335,59 @@ namespace Tests {
         assert(college.find<Teacher>(make_shared<Course>("Abba")).empty());
         assert(college.add_course("Abba"));
 
+        College c3;
+        assert(c3.add_course("C1"));
+        auto cc1 = *c3.find_courses("C1").begin();
+        assert(c3.change_course_activeness(cc1, false));
+        assert(!c3.add_course("C1"));
+
         cout << "OK" << endl;
+    }
+
+    void test_witt() {
+        College c;
+        c.add_course("a", true);
+        std::shared_ptr<Course> course_ptr = *(c.find_courses("a").begin());
+        Course course = *(course_ptr.get()); // tworzymy kopię kursu
+        c.change_course_activeness(course_ptr, false);
+        assert(course.is_active());
+    }
+
+    // https://moodle.mimuw.edu.pl/mod/forum/discuss.php?d=9377#p20201
+    void test_forum1() {
+        cout << "Test forum 1: ";
+
+        College c;
+        assert(c.add_course("PW"));
+        assert(c.add_person<Student>("A", "A"));
+        auto s = *c.find<Student>("A", "A").begin();
+        auto p = *c.find_courses("PW").begin();
+        assert(c.assign_course(s, p));
+        assert(c.remove_course(p));
+        assert(c.add_course("PW"));
+        auto p2 = *c.find_courses("PW").begin();
+        assert(!c.assign_course(s, p2));
+
+        cout << "OK" << endl;
+    }
+
+    // https://moodle.mimuw.edu.pl/mod/forum/discuss.php?d=9377#p20222
+    void test_forum2() {
+        College c1, c2;
+        assert(c1.add_course("Analysis"));
+        assert(c2.add_course("Analysis"));
+        assert(c1.add_person<Student>("Jan", "Kowalski"));
+        assert(c2.add_person<Student>("Piotr", "Nowak"));
+        auto jan_kowalski = *c1.find<Student>("Jan", "Kowalski").begin();
+        auto piotr_nowak = *c2.find<Student>("Piotr", "Nowak").begin();
+        auto analysis1 = *c1.find_courses("Analysis").begin();
+        auto analysis2 = *c2.find_courses("Analysis").begin();
+        assert(c1.assign_course(jan_kowalski, analysis1));
+        assert(c2.assign_course(piotr_nowak, analysis2));
+        assert(c1.find<Student>(analysis1).size() == 1);
+        assert(c2.find<Student>(analysis2).size() == 1);
+        assert(c1.find<Student>(analysis2).size() == 0);
+        assert(c2.find<Student>(analysis1).size() == 0);
     }
 }
 
@@ -343,6 +395,9 @@ int main() {
     Tests::init(321312);
     auto tests = {
             &Tests::test_corner_cases,
+            &Tests::test_witt,
+            &Tests::test_forum2,
+//            &Tests::test_forum1,
             &Tests::test_courses,
             &Tests::test_people
     };

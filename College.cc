@@ -50,11 +50,15 @@ bool College::change_student_activeness(const std::shared_ptr<Student> &student,
 
 template<>
 std::set<std::shared_ptr<Teacher>> College::find<Teacher>(const std::shared_ptr<Course> &course) {
+    if (!course_teachers_.contains(course))
+        return {};
     return course_teachers_[course].values();
 }
 
 template<>
 std::set<std::shared_ptr<Student>> College::find<Student>(const std::shared_ptr<Course> &course) {
+    if (!course_students_.contains(course))
+        return {};
     return course_students_[course].values();
 }
 
@@ -81,10 +85,10 @@ bool College::assign_course<Teacher>(
         const std::shared_ptr<Teacher> &teacher,
         const std::shared_ptr<Course> &course
 ) {
-    if (!courses_.contains(course))
-        throw std::runtime_error("Non-existing course.");
     if (!course->is_active())
         throw std::runtime_error("Incorrect operation on an inactive course.");
+    if (!courses_.contains(course))
+        throw std::runtime_error("Non-existing course.");
     if (!teachers_.contains(teacher))
         throw std::runtime_error("Non-existing person.");
 
