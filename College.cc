@@ -5,15 +5,6 @@ bool College::add_course(const std::string &name, bool active) {
     return courses_.add(new_course);
 }
 
-// TODO: nie działa
-/*std::set<std::shared_ptr<Course>, decltype(details::cmp_pnt)> College::find_courses(const std::string &pattern) {
-    auto tmp = courses_.find_courses(pattern);
-    std::set<std::shared_ptr<Course>, decltype(details::cmp_pnt)> result(details::cmp_pnt);
-    for (const auto &ptr : tmp)
-        result.emplace(ptr);
-    return result;
-}*/
-
 bool College::change_course_activeness(const std::shared_ptr<Course> &course, bool active) {
     if (!courses_.contains(course))
         return false;
@@ -57,42 +48,14 @@ bool College::change_student_activeness(const std::shared_ptr<Student> &student,
     return true;
 }
 
-// TODO: nie działa
-/*template <typename T>
-    requires (std::is_same_v<T, Person>
-              || std::is_same_v<T, Teacher>
-              || std::is_same_v<T, Student>
-              || std::is_same_v<T, PhDStudent>)
-    std::set<std::shared_ptr<T>, decltype(details::cmp_pnt)> College::find(const std::string &name_pattern, const std::string &surname_pattern) {
-    std::set<std::shared_ptr<T>, decltype(details::cmp_pnt)> result(details::cmp_pnt);
-    if constexpr (std::is_base_of_v<Student, T> || std::is_base_of_v<T, Student>) {
-        auto students = students_.find_people(name_pattern, surname_pattern);
-        for (const auto &val : students) {
-            auto tmp = std::dynamic_pointer_cast<T>(val);
-            if (tmp != nullptr)
-                result.insert(tmp);
-        }
-    }
-
-    if constexpr (std::is_base_of_v<T, Teacher>) {//(std::is_base_of_v<Teacher, T> || std::is_base_of_v<T, Teacher>) {
-        auto teachers = teachers_.find_people(name_pattern, surname_pattern);
-        for (const auto &val : teachers) {
-            auto tmp = std::dynamic_pointer_cast<T>(val);
-            if (tmp != nullptr)
-                result.insert(tmp);
-        }
-    }
-    return result;
-}*/
-
 template<>
 std::set<std::shared_ptr<Teacher>> College::find<Teacher>(const std::shared_ptr<Course> &course) {
-    return course_teachers_[course].get_values();
+    return course_teachers_[course].values();
 }
 
 template<>
 std::set<std::shared_ptr<Student>> College::find<Student>(const std::shared_ptr<Course> &course) {
-    return course_students_[course].get_values();
+    return course_students_[course].values();
 }
 
 template<>

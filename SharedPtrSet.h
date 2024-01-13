@@ -20,7 +20,10 @@ public:
     bool add(const std::shared_ptr<T> &val);
     bool remove(const std::shared_ptr<T> &val);
     bool contains(const std::shared_ptr<T> &val) const;
-    std::set<std::shared_ptr<T>> get_values() const;
+    std::set<std::shared_ptr<T>, decltype(&compare)> const& values_raw() const {
+        return values_;
+    }
+    std::set<std::shared_ptr<T>> values() const;
 };
 
 template<class T>
@@ -46,13 +49,12 @@ bool SharedPtrSet<T>::contains(const std::shared_ptr<T> &value) const {
 }
 
 template<class T>
-std::set<std::shared_ptr<T>> SharedPtrSet<T>::get_values() const {
+std::set<std::shared_ptr<T>> SharedPtrSet<T>::values() const {
     std::set<std::shared_ptr<T>> result;
     for (auto &value : values_)
         result.emplace(value);
     return result;
 }
-
 
 
 #endif //MY_LIST_H

@@ -36,7 +36,6 @@ private:
 public:
     bool add_course(const std::string &name, bool active = true);
 
-    // TODO: jak umiecie wywalić do .cpp żeby to łapało to to zróbcie XD
     std::set<std::shared_ptr<Course>, decltype(details::cmp_pnt)> find_courses(const std::string &pattern) const {
         auto tmp = courses_.find_courses(pattern);
         std::set<std::shared_ptr<Course>, decltype(details::cmp_pnt)> result(details::cmp_pnt);
@@ -62,7 +61,6 @@ public:
             bool active
     );
 
-    // TODO: jak umiecie wywalić do .cpp żeby to łapało to to zróbcie XD
     template <typename T>
     requires (std::is_same_v<T, Person>
               || std::is_same_v<T, Teacher>
